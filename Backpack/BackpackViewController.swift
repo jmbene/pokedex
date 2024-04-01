@@ -20,10 +20,11 @@ final class BackpackViewController: UIViewController {
         return label
     }()
     
-    lazy private var collectioViewBackpack: UICollectionView = {
+    lazy private var collectionViewBackpack: UICollectionView = {
         let flowLayout = UICollectionViewFlowLayout()
         let width = Double(view.frame.size.width / 4)
         flowLayout.itemSize = CGSize(width: width , height: width * 3 / 2)
+        flowLayout.minimumLineSpacing = 20.0
         let collectionView = UICollectionView(frame: view.frame, collectionViewLayout: flowLayout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.dataSource = self
@@ -47,8 +48,8 @@ final class BackpackViewController: UIViewController {
             make.centerX.equalTo(view)
             make.centerY.equalTo(view)
          }
-        collectioViewBackpack.snp.makeConstraints { make in
-            make.edges.equalTo(view).inset(UIEdgeInsets.zero)
+        collectionViewBackpack.snp.makeConstraints { make in
+            make.edges.equalTo(view).inset(UIEdgeInsets(top: 20.0, left: 20.0, bottom: 20.0, right: 20.0))
         }
     }
 
@@ -98,7 +99,7 @@ extension BackpackViewController: BackpackViewInterface {
     func showBackpackContents(_ contents: [Pokemon]) {
         self.pokemons = contents
         labelStatusBackpack.isHidden = true
-        collectioViewBackpack.reloadData()
+        collectionViewBackpack.reloadData()
     }
     
 }
@@ -118,6 +119,7 @@ class BackpackCollectionViewCell: UICollectionViewCell {
     lazy private var labelName: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .preferredFont(forTextStyle: .footnote)
         label.text = "Pokemon"
         return label
     }()
@@ -139,6 +141,11 @@ class BackpackCollectionViewCell: UICollectionViewCell {
     }
     
     private func configureCell() {
+        contentView.layer.borderColor = UIColor.gray.cgColor
+        contentView.backgroundColor = .gray.withAlphaComponent(0.1)
+        contentView.layer.borderWidth = 1.0
+        contentView.layer.cornerRadius = 8.0
+        
         stackViewContent.addArrangedSubview(imageViewPokemon)
         stackViewContent.addArrangedSubview(labelName)
         contentView.addSubview(stackViewContent)
@@ -148,7 +155,7 @@ class BackpackCollectionViewCell: UICollectionViewCell {
     
     private func setupConstraints() {
         stackViewContent.snp.makeConstraints { make in
-            make.edges.equalTo(contentView).inset(UIEdgeInsets.zero)
+            make.edges.equalTo(contentView).inset(UIEdgeInsets(top: 10.0, left: 0.0, bottom: 10.0, right: 0.0))
         }
     }
     
