@@ -57,7 +57,7 @@ final class BackpackViewController: UIViewController {
         view.backgroundColor = .white
         title = "Backpack"
         
-        view.addSubview(collectioViewBackpack)
+        view.addSubview(collectionViewBackpack)
         view.addSubview(labelStatusBackpack)
         
         setupConstraints()
