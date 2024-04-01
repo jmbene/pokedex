@@ -15,4 +15,7 @@ final class BackpackInteractor {
 // MARK: - Extensions -
 
 extension BackpackInteractor: BackpackInteractorInterface {
+    func getBackpack() -> [Pokemon] {
+        return [.bulbasaur, .charmander, .pikachu, .mewtwo]
+    }
 }

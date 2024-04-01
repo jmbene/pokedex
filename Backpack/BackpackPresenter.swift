@@ -31,4 +31,13 @@ final class BackpackPresenter {
 // MARK: - Extensions -
 
 extension BackpackPresenter: BackpackPresenterInterface {
+    func configure() {
+        let pokemons = interactor.getBackpack()
+        if pokemons.isEmpty {
+            view.showEmptyBackpack()
+        } else {
+            view.showBackpackContents(pokemons)
+        }
+    }
+    
 }

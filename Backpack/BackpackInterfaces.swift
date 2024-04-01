@@ -10,16 +10,21 @@
 import UIKit
 
 protocol BackpackWireframeInterface: WireframeInterface {
+    
 }
 
 protocol BackpackViewInterface: ViewInterface {
+    func showEmptyBackpack()
+    func showBackpackContents(_ contents: [Pokemon])
 }
 
 protocol BackpackPresenterInterface: PresenterInterface {
+    func configure() -> Void
 }
 
 protocol BackpackFormatterInterface: FormatterInterface {
 }
 
 protocol BackpackInteractorInterface: InteractorInterface {
+    func getBackpack() -> [Pokemon]
 }

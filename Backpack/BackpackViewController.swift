@@ -9,16 +9,33 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class BackpackViewController: UIViewController {
     
-    lazy private var sampleLabel: UILabel = {
+    lazy private var labelStatusBackpack: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Hello World!"
+        label.text = "Your backpack is empty!"
         return label
     }()
+    
+    lazy private var collectioViewBackpack: UICollectionView = {
+        let flowLayout = UICollectionViewFlowLayout()
+        let width = Double(view.frame.size.width / 4)
+        flowLayout.itemSize = CGSize(width: width , height: width * 3 / 2)
+        let collectionView = UICollectionView(frame: view.frame, collectionViewLayout: flowLayout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.register(BackpackCollectionViewCell.self, forCellWithReuseIdentifier: pokemonCellIdentifier)
+        return collectionView
+    }()
 
+    private let pokemonCellIdentifier = "PokemonCell"
+    
+    var pokemons: [Pokemon] = []
+    
     // MARK: - Public properties -
 
     var presenter: BackpackPresenterInterface!
@@ -26,23 +43,119 @@ final class BackpackViewController: UIViewController {
     // MARK: - Lifecycle -
     
     func setupConstraints() {
-        sampleLabel.snp.makeConstraints { (make) -> Void in
-            make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
+        labelStatusBackpack.snp.makeConstraints { (make) -> Void in
+            make.centerX.equalTo(view)
+            make.centerY.equalTo(view)
          }
+        collectioViewBackpack.snp.makeConstraints { make in
+            make.edges.equalTo(view).inset(UIEdgeInsets.zero)
+        }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        view.addSubview(sampleLabel)
+        title = "Backpack"
+        
+        view.addSubview(collectioViewBackpack)
+        view.addSubview(labelStatusBackpack)
         
         setupConstraints()
+        
+        presenter.configure()
     }
 
 }
 
 // MARK: - Extensions -
 
+extension BackpackViewController: UICollectionViewDelegate {
+    
+}
+
+extension BackpackViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return pokemons.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let pokemon = pokemons[indexPath.row]
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: pokemonCellIdentifier, for: indexPath) as? BackpackCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        cell.configure(with: pokemon)
+        return cell
+    }
+    
+}
+
 extension BackpackViewController: BackpackViewInterface {
+    func showEmptyBackpack() {
+        self.pokemons = []
+        labelStatusBackpack.isHidden = false
+    }
+    
+    func showBackpackContents(_ contents: [Pokemon]) {
+        self.pokemons = contents
+        labelStatusBackpack.isHidden = true
+        collectioViewBackpack.reloadData()
+    }
+    
+}
+
+class BackpackCollectionViewCell: UICollectionViewCell {
+    
+    lazy private var stackViewContent: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.alignment = .center
+        stackView.spacing = 20
+        stackView.distribution = .fill
+        return stackView
+    }()
+    
+    lazy private var labelName: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Pokemon"
+        return label
+    }()
+    
+    lazy private var imageViewPokemon: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        configureCell()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func configureCell() {
+        stackViewContent.addArrangedSubview(imageViewPokemon)
+        stackViewContent.addArrangedSubview(labelName)
+        contentView.addSubview(stackViewContent)
+        
+        setupConstraints()
+    }
+    
+    private func setupConstraints() {
+        stackViewContent.snp.makeConstraints { make in
+            make.edges.equalTo(contentView).inset(UIEdgeInsets.zero)
+        }
+    }
+    
+    func configure(with pokemon: Pokemon) {
+        labelName.text = pokemon.name
+        imageViewPokemon.kf.setImage(with: pokemon.imageURL)
+    }
+    
+    
 }
